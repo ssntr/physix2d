@@ -1,6 +1,11 @@
 from config import plt
-from shape import Shape
+from shape import Shape, Plotter
 
 triangle = Shape([[0.2, 0], [-0.1, 0.1], [-0.1, -0.1]])
+dot = Shape([[0, 0]], velocity=[15.75, 25.53])
+
 triangle.draw()
-plt.show()
+
+plotter = Plotter([dot])
+plotter.generate_trajectories()
+plotter.plot_trajectories()
