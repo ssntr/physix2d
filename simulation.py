@@ -15,7 +15,6 @@ class Simulation:
         for shape in self.shapes:
             x, y = shape.cm()
             vx, vy = shape.velocity
-
             means = [np.array([x, y])]
 
             time = 0
@@ -37,6 +36,9 @@ class Simulation:
             for t in trajectories:
                 movement_vec = t - initial_pos
                 shape.vertices += movement_vec
+
+                shape.angle += shape.rotation * self.delta_time
+                shape.rotate()
 
                 shape.plot()
 

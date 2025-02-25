@@ -1,7 +1,5 @@
 from config import np, plt, draw_config
-from math import sqrt
-from math import sin
-from math import cos
+
 class Shape:
     def __init__(self, vertices, mass=1, velocity=np.array([0, 0]), rotation=0):
         self.vertices = np.array(vertices)
@@ -36,13 +34,16 @@ class Shape:
         self.plot()
         plt.show()
 
-    def rotate_x(self, angle):
-        rotated_verts = []
-        for vert in self.vertices:
-            y = vert[0] * cos(self.rotation * angle) - vert[1] * sin(self.rotation * angle)
-            z = vert[0] * sin(self.rotation * angle) + vert[1] * cos(self.rotation * angle)
-            rotated_verts.append([z, y])
-        self.vertices = rotated_verts
+    def rotate(self):
+        rotation_matrix = np.array([
+            [np.cos(self.angle), -np.sin(self.angle)],
+            [np.sin(self.angle), np.cos(self.angle)],
+        ])
+
+        self.vertices = self.cm_in_origin() @ rotation_matrix + self.cm()
+
+
+
 
 
 # class Plotter:
