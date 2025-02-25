@@ -13,6 +13,10 @@ class Shape:
     def cm(self):
         return self.vertices.mean(axis=0)
 
+    def cm_in_origin(self):
+        vector_to_origin = np.array([0, 0]) - self.cm()
+        return self.vertices + vector_to_origin
+
     def plot(self):
         plt.plot(
             np.append(self.vertices[:, 0], self.vertices[0, 0]),
@@ -30,7 +34,7 @@ class Shape:
         plt.xlim(draw_config["xlim"])
         plt.ylim(draw_config["ylim"])
         self.plot()
-        plt.draw()
+        plt.show()
 
     def rotate_x(self, angle):
         rotated_verts = []
