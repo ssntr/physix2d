@@ -20,14 +20,8 @@ class Simulation:
 
             time = 0
             while time < self.sim_time:
-                v = sqrt(vx ** 2 + vy ** 2)
-
-                ax = v*vx
-                ay = self.gravity + (v*vy)
-                vx += ax * self.delta_time
-                vy += ay * self.delta_time
-
-                new_mean = means[-1] + np.array([vx * self.delta_time, vy * self.delta_time])
+                vy += self.gravity * self.delta_time
+                new_mean = means[-1] + np.array([vx, vy]) * self.delta_time
                 means.append(new_mean)
                 time += self.delta_time
 
