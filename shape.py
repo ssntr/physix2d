@@ -7,6 +7,7 @@ class Shape:
         self.velocity = np.array(velocity)
         self.rotation = rotation
         self.angle = 0
+        self.reference_vertices = self.cm_in_origin().copy()
 
     def cm(self):
         return self.vertices.mean(axis=0)
@@ -14,6 +15,9 @@ class Shape:
     def cm_in_origin(self):
         vector_to_origin = np.array([0, 0]) - self.cm()
         return self.vertices + vector_to_origin
+
+    def move_shape(self, vector):
+        self.vertices += vector
 
     def plot(self):
         plt.plot(
@@ -40,46 +44,6 @@ class Shape:
             [np.sin(self.angle), np.cos(self.angle)],
         ])
 
-        self.vertices = self.cm_in_origin() @ rotation_matrix + self.cm()
-
-
-
-
-
-# class Plotter:
-#     def __init__(self, shapes, delta_time=0.05, gravity=9.81):
-#         self.shapes = shapes
-#         self.delta_time = delta_time
-#         self.gravity = gravity
-#         self.air_resistance = 0.1
-#         self.trajectories = {}
-#         for shape in shapes:
-#             self.trajectories[shape] = []
-#
-#     def generate_trajectories(self):
-#         for shape in self.shapes:
-#             x, y = shape.vertices.mean(axis=0)
-#             vx, vy = shape.velocity
-#
-#             means = [np.array([x, y])]
-#
-#             while means[-1][1] >= 0:
-#                 v = sqrt(vx ** 2 + vy ** 2)
-#
-#                 ax = -self.air_resistance*v*vx
-#                 ay = -self.gravity - (self.air_resistance*v*vy)
-#                 vx += ax * self.delta_time
-#                 vy += ay * self.delta_time
-#
-#                 new_mean = means[-1] + np.array([vx * self.delta_time, vy * self.delta_time])
-#                 means.append(new_mean)
-#
-#             self.trajectories[shape] = np.array(means)
-#
-#     def plot_trajectories(self):
-#         for shape, t in self.trajectories.items():
-#             plt.plot(t[:, 0], t[:, 1])
-#
-#         plt.xlabel("x (m)")
-#         plt.ylabel("y (m)")
-#         plt.show()
+        rotated_vertices = (rotation_matrix @ self.reference_vertices.T).T
+        self.vertices = rotated_vertices + self.cm()
+        print(self.vertices)

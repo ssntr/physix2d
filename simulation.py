@@ -1,7 +1,5 @@
-import copy
-
 from config import np, plt, draw_config
-from math import sqrt
+
 
 class Simulation:
     def __init__(self, shapes, sim_time=1, delta_time=0.1, gravity=-9.81):
@@ -34,16 +32,14 @@ class Simulation:
         plt.ylim(draw_config["ylim"])
 
         for shape, trajectories in self.trajectories.items():
-            shape_copy = copy.deepcopy(shape)
             time = 0
             for t in trajectories:
-                movement_vec = t - shape.cm()
-                shape_copy.vertices = shape.vertices + movement_vec
+                shape.move_shape(t - shape.cm())
 
-                shape_copy.angle = shape.angle + shape.rotation * time
-                shape_copy.rotate()
+                shape.angle = shape.rotation * time
+                shape.rotate()
 
-                shape_copy.plot()
+                shape.plot()
                 time += self.delta_time
 
         plt.show()
