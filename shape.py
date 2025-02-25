@@ -10,6 +10,9 @@ class Shape:
         self.rotation = rotation
         self.angle = 0
 
+    def cm(self):
+        return self.vertices.mean(axis=0)
+
     def plot(self):
         plt.plot(
             np.append(self.vertices[:, 0], self.vertices[0, 0]),
