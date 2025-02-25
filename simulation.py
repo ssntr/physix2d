@@ -15,10 +15,10 @@ class Simulation:
         for shape in self.shapes:
             x, y = shape.cm()
             vx, vy = shape.velocity
-            means = [np.array([x, y])]
+            means = [np.array([x, y]) + np.array([vx, vy]) * self.delta_time]
 
-            time = 0
-            while time < self.sim_time:
+            time = self.delta_time
+            while time < self.sim_time - self.delta_time:
                 vy += self.gravity * self.delta_time
                 new_mean = means[-1] + np.array([vx, vy]) * self.delta_time
                 means.append(new_mean)
@@ -32,14 +32,13 @@ class Simulation:
         plt.ylim(draw_config["ylim"])
 
         for shape, trajectories in self.trajectories.items():
-            time = 0
+            shape.plot()
             for t in trajectories:
                 shape.move_shape(t - shape.cm())
 
-                shape.angle = shape.rotation * time
+                shape.angle += shape.rotation * self.delta_time
                 shape.rotate()
 
                 shape.plot()
-                time += self.delta_time
 
         plt.show()

@@ -46,4 +46,3 @@ class Shape:
 
         rotated_vertices = (rotation_matrix @ self.reference_vertices.T).T
         self.vertices = rotated_vertices + self.cm()
-        print(self.vertices)
