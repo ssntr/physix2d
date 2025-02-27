@@ -1,4 +1,5 @@
 from config import np, plt, draw_config
+from shape import Shape
 
 
 class Simulation:
@@ -42,3 +43,20 @@ class Simulation:
                 shape.plot()
 
         plt.show()
+
+    def collision(self):
+        shape = self.shapes[0]
+        other_shape = self.shapes[1]
+        edges = shape.get_edges()
+        for vertex in other_shape.vertices:
+            cross_products = []
+            for i in range(len(edges)):
+                reference_vertex = shape.vertices[i]
+                rp = np.array(vertex - reference_vertex)
+                cross = np.cross(edges[i], rp)
+                cross_products.append(cross)
+
+            if np.all(np.array(cross_products)) > 0:
+                return True
+
+        return False

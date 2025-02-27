@@ -46,3 +46,14 @@ class Shape:
 
         rotated_vertices = (rotation_matrix @ self.reference_vertices.T).T
         self.vertices = rotated_vertices + self.cm()
+
+    def get_edges(self):
+        edges = []
+        for i in range(len(self.vertices)):
+            if i == len(self.vertices) - 1:
+                edge = self.vertices[0] - self.vertices[i]
+            else:
+                edge = self.vertices[i + 1] - self.vertices[i]
+
+            edges.append(edge)
+        return np.array(edges)
