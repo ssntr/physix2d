@@ -45,18 +45,24 @@ class Simulation:
         plt.show()
 
     def collision(self):
-        shape = self.shapes[0]
-        other_shape = self.shapes[1]
-        edges = shape.get_edges()
-        for vertex in other_shape.vertices:
-            cross_products = []
-            for i in range(len(edges)):
-                reference_vertex = shape.vertices[i]
-                rp = np.array(vertex - reference_vertex)
-                cross = np.cross(edges[i], rp)
-                cross_products.append(cross)
+        for i, shape in  enumerate(self.shapes):
+            edges = shape.get_edges()
+            for j, other_shape in enumerate(self.shapes):
+                if i == j:
+                    continue
 
-            if np.all(np.array(cross_products)) > 0:
-                return True
+                print(f"Collision between shape {i} edges and shape {j} vertices")
+                for vertex in other_shape.vertices:
+                    cross_products = []
+                    for k in range(len(edges)):
+                        reference_vertex = shape.vertices[k]
+                        rp = np.array(vertex - reference_vertex)
+                        cross = np.cross(edges[k], rp)
+                        cross_products.append(cross)
+
+                print(cross_products)
+                if np.all(np.array(cross_products) > 0):
+                    print(f"Collision found in vertex {vertex}")
+                    return True
 
         return False
