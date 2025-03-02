@@ -46,26 +46,58 @@ class Simulation:
 
 
     def collision(self):
-        for i, shape in  enumerate(self.shapes):
-            edges = shape.get_edges()
-            for j, other_shape in enumerate(self.shapes):
+        for i, edge_shape in  enumerate(self.shapes):
+            edges = edge_shape.get_edges()
+            for j, vertex_shape in enumerate(self.shapes):
                 if i == j:
                     continue
 
-                print(f"Collision between shape {shape.vertices} edges and shape {other_shape.vertices} vertices")
-                for vertex in other_shape.vertices:
+                for vertex in vertex_shape.vertices:
                     cross_products = []
                     for k in range(len(edges)):
-                        reference_vertex = shape.vertices[k]
+                        reference_vertex = edge_shape.vertices[k]
                         rp = np.array(vertex - reference_vertex)
                         cross = float(np.cross(edges[k], rp))
                         cross_products.append(cross)
-                        print(f"Edge {k}: {edges[k]}, Reference: {reference_vertex}, Vertex: {vertex}, Cross: {cross}")
-
-                    print(cross_products)
 
                     if np.all(np.array(cross_products) > 0):
-                        print(f"Collision detected: vertex {vertex} inside shape {shape.vertices}!")
-                        return True
+                        print(f"Collision detected: vertex {vertex} inside shape {edge_shape.vertices}!")
+                        return np.array(vertex), edge_shape, vertex_shape
 
         return False
+
+    def closest_edge(self, collision_vertex, edge_shape):
+        closest_edge = None
+        smallest_distance = float('inf')
+
+        edges = edge_shape.get_edges()
+        print(edges)
+        for i, edge in enumerate(edges):
+            r_EP = collision_vertex - edge_shape.vertices[i]
+            norm = np.linalg.norm(edge)
+            normalized_edge = edge / norm
+            distance = abs(np.cross(normalized_edge, r_EP))
+
+            if distance < smallest_distance:
+                smallest_distance = distance
+                closest_edge = edge
+
+        return closest_edge
+
+
+
+    def relative_velocity(self, collision_vertex, edge_shape, vertex_shape):
+        r_AP = (collision_vertex - vertex_shape.cm())
+        r_BP = (collision_vertex - edge_shape.cm())
+
+        rotation_AP = vertex_shape.rotation
+        rotation_BP = edge_shape.rotation
+
+        #This trick was in our physics material, and gets around the need to make rotation a 3d vector
+        velocity_AP_rot = np.array([-rotation_AP * r_AP[1], rotation_AP * r_AP[0]])
+        velocity_BP_rot = np.array([-rotation_BP * r_BP[1], rotation_BP * r_BP[0]])
+
+        velocity_AP = vertex_shape.velocity + velocity_AP_rot
+        velocity_BP = edge_shape.velocity + velocity_BP_rot
+
+        return velocity_AP - velocity_BP
