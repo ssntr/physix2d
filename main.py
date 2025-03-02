@@ -4,15 +4,13 @@ from shape import Shape
 from simulation import Simulation
 
 
-triangle = Shape([[-.25, .5], [-.8, .6], [-.8, .4]],
+triangle = Shape([[-.24, .5], [-.8, .45], [-.8, .3]],
                  velocity=[1, -1], rotation=numpy.pi)
 
-triangle2 = Shape([[0, .5], [-.3, .6], [-.3, .4]],
+triangle2 = Shape([[.1, .5], [-.3, .6], [-.25, .42]],
                  velocity=[-1, -1], rotation=numpy.pi)
 
-# This one collides
-# triangle2 = Shape([[0, .5], [-.3, .6], [-.6, .5]],
-#                  velocity=[-1, -1], rotation=numpy.pi)
+triangle2.move_shape([0,-.11])
 
 simulation = Simulation([triangle, triangle2], gravity=0)
 simulation.draw_movement()
