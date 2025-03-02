@@ -84,8 +84,6 @@ class Simulation:
 
         return closest_edge
 
-
-
     def relative_velocity(self, collision_vertex, edge_shape, vertex_shape):
         r_AP = (collision_vertex - vertex_shape.cm())
         r_BP = (collision_vertex - edge_shape.cm())
@@ -101,3 +99,12 @@ class Simulation:
         velocity_BP = edge_shape.velocity + velocity_BP_rot
 
         return velocity_AP - velocity_BP
+
+    def collision_normal(self, closest_edge):
+        edge_3d = np.array([closest_edge[0], closest_edge[1], 0])
+        k = np.array([0, 0, 1])
+
+        normal = np.cross(edge_3d, k)[:2]
+        norm = np.linalg.norm(normal)
+
+        return normal / norm if norm !=0 else normal
