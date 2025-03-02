@@ -3,11 +3,12 @@ from shape import Shape
 
 
 class Simulation:
-    def __init__(self, shapes, sim_time=1, delta_time=0.1, gravity=-9.81):
+    def __init__(self, shapes, sim_time=1, delta_time=0.1, gravity=-9.81, e=1):
         self.shapes = shapes
         self.sim_time = sim_time
         self.delta_time = delta_time
         self.gravity = gravity
+        self.e = e #Törmäyskerroin
         self.trajectories = {}
         for shape in self.shapes:
             self.trajectories[shape] = []
@@ -84,6 +85,7 @@ class Simulation:
 
         return closest_edge
 
+
     def relative_velocity(self, collision_vertex, edge_shape, vertex_shape):
         r_AP = (collision_vertex - vertex_shape.cm())
         r_BP = (collision_vertex - edge_shape.cm())
@@ -91,7 +93,7 @@ class Simulation:
         rotation_AP = vertex_shape.rotation
         rotation_BP = edge_shape.rotation
 
-        #This trick was in our physics material, and gets around the need to make rotation a 3d vector
+        #This trick was in our physics material, and gets around the need to make 3d vectors
         velocity_AP_rot = np.array([-rotation_AP * r_AP[1], rotation_AP * r_AP[0]])
         velocity_BP_rot = np.array([-rotation_BP * r_BP[1], rotation_BP * r_BP[0]])
 
@@ -108,3 +110,18 @@ class Simulation:
         norm = np.linalg.norm(normal)
 
         return normal / norm if norm !=0 else normal
+
+    def impulse(self, edge_shape, vertex_shape, relative_velocity, collision_vertex, collision_normal):
+        r_AP = (collision_vertex - vertex_shape.cm())
+        r_BP = (collision_vertex - edge_shape.cm())
+
+        mass_inverse_sum = (1 / vertex_shape.mass) + (1 / edge_shape.mass)
+
+        inertia_component_A = np.cross(r_AP, collision_normal) ** 2 / vertex_shape.j
+        inertia_component_B = np.cross(r_BP, collision_normal) ** 2 / edge_shape.j
+
+        relative_dot_product = np.dot(relative_velocity, collision_normal)
+
+        impulse = -(1 + self.e) * (relative_dot_product / (mass_inverse_sum + inertia_component_A + inertia_component_B))
+
+        return impulse
