@@ -7,6 +7,8 @@ draw_config = {
     "ylim": (-1, 1),
     "txt_color": "red",
     "fontsize": 8,
+    "floor_color": "black",
+    "line_style": "--"
 }
 
 # def draw_from_config(x_list,y_list):
