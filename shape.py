@@ -1,12 +1,13 @@
 from config import np, plt, draw_config
 
 class Shape:
-    def __init__(self, vertices, mass=1, velocity=np.array([0, 0]), rotation=0):
+    def __init__(self, vertices, mass=1, velocity=np.array([0, 0]), rotation=0, j=0.02):
         self.vertices = np.array(vertices)
         self.mass = mass
         self.velocity = np.array(velocity)
         self.rotation = rotation
         self.angle = 0
+        self.j = j
         self.reference_vertices = self.cm_in_origin().copy()
 
     def cm(self):
