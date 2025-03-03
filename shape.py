@@ -17,8 +17,9 @@ class Shape:
         vector_to_origin = np.array([0, 0]) - self.cm()
         return self.vertices + vector_to_origin
 
-    def move_shape(self, vector):
-        self.vertices += vector
+    def move_shape(self, vector, delta_time):
+        self.vertices += vector * delta_time
+        self.angle += self.rotation * delta_time
 
     def plot(self):
         plt.plot(

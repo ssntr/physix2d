@@ -3,15 +3,46 @@ from shape import Shape
 
 
 class Simulation:
-    def __init__(self, shapes, sim_time=1, delta_time=0.1, gravity=-9.81, e=1):
+    def __init__(self, shapes, sim_time=3, delta_time=0.05, gravity=-9.81, e=1):
         self.shapes = shapes
         self.sim_time = sim_time
         self.delta_time = delta_time
         self.gravity = gravity
         self.e = e #Törmäyskerroin
         self.trajectories = {}
+        self.angles = {}
         for shape in self.shapes:
             self.trajectories[shape] = []
+            self.angles[shape] = []
+
+        self.collision_items = None
+
+    def handle_simulation(self):
+        plt.figure(figsize=draw_config["figsize"])
+        plt.xlim(draw_config["xlim"])
+        plt.ylim(draw_config["ylim"])
+
+        for shape in self.shapes:
+            shape.plot()
+
+        time = self.delta_time
+        while time < self.sim_time - self.delta_time:
+            if self.collision():
+                closest_edge = self.closest_edge(self.collision_items["collision_vertex"], self.collision_items["edge_shape"])
+                relative_velocity = self.relative_velocity(self.collision_items["collision_vertex"], self.collision_items["edge_shape"], self.collision_items["vertex_shape"])
+                collision_normal = self.collision_normal(closest_edge)
+
+                if np.dot(relative_velocity, collision_normal) < 0:
+                    impulse = self.impulse(self.collision_items["edge_shape"], self.collision_items["vertex_shape"], relative_velocity, self.collision_items["collision_vertex"], collision_normal)
+                    self.update_shape_velocities(self.collision_items["edge_shape"], self.collision_items["vertex_shape"], self.collision_items["collision_vertex"], collision_normal, impulse)
+
+            for shape in self.shapes:
+                shape.move_shape(shape.velocity, self.delta_time)
+                shape.rotate()
+                shape.plot()
+                time += self.delta_time
+
+        plt.show()
 
     def generate_cm_trajectory(self):
         for shape in self.shapes:
@@ -63,7 +94,12 @@ class Simulation:
 
                     if np.all(np.array(cross_products) > 0):
                         print(f"Collision detected: vertex {vertex} inside shape {edge_shape.vertices}!")
-                        return np.array(vertex), edge_shape, vertex_shape
+                        self.collision_items = {
+                            "collision_vertex": np.array(vertex),
+                            "edge_shape": edge_shape,
+                            "vertex_shape": vertex_shape
+                        }
+                        return True
 
         return False
 
@@ -145,4 +181,5 @@ class Simulation:
         updated_rot_A = vertex_shape.rotation + impulse/vertex_shape.mass * np.cross(r_AP, collision_normal)[2]
         updated_rot_B = edge_shape.rotation - impulse/edge_shape.mass * np.cross(r_BP, collision_normal)[2]
 
-        print(updated_rot_A, updated_rot_B)
+        vertex_shape.rotation = updated_rot_A
+        edge_shape.rotation = updated_rot_B
