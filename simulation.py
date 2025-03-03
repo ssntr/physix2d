@@ -125,3 +125,24 @@ class Simulation:
         impulse = -(1 + self.e) * (relative_dot_product / (mass_inverse_sum + inertia_component_A + inertia_component_B))
 
         return impulse
+
+    def update_shape_velocities(self, edge_shape, vertex_shape, collision_vertex, collision_normal, impulse):
+        v_A = vertex_shape.velocity + impulse/vertex_shape.mass * collision_normal
+        v_B = edge_shape.velocity - impulse/edge_shape.mass * collision_normal
+
+        vertex_shape.velocity = v_A
+        edge_shape.velocity = v_B
+
+        print(vertex_shape.velocity, edge_shape.velocity)
+
+        AP = (collision_vertex - vertex_shape.cm())
+        r_AP = np.array([AP[0], AP[1], 0])
+        BP = (collision_vertex - edge_shape.cm())
+        r_BP = np.array([BP[0], BP[1], 0])
+
+        collision_normal = np.array([collision_normal[0], collision_normal[1], 0])
+
+        updated_rot_A = vertex_shape.rotation + impulse/vertex_shape.mass * np.cross(r_AP, collision_normal)[2]
+        updated_rot_B = edge_shape.rotation - impulse/edge_shape.mass * np.cross(r_BP, collision_normal)[2]
+
+        print(updated_rot_A, updated_rot_B)

@@ -20,4 +20,5 @@ relative_velocity = simulation.relative_velocity(vertex, edgeshape, vertexshape)
 closest_edge = simulation.closest_edge(vertex, edgeshape)
 collision_normal = simulation.collision_normal(closest_edge)
 
-print(simulation.impulse(edgeshape, vertexshape, relative_velocity, vertex, collision_normal))
+impulse = simulation.impulse(edgeshape, vertexshape, relative_velocity, vertex, collision_normal)
+print(simulation.update_shape_velocities(edgeshape, vertexshape, vertex, collision_normal, impulse))
