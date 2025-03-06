@@ -10,7 +10,7 @@ class Simulation:
         self.gravity = gravity
         self.e = e #Törmäyskerroin
         self.trajectories = {}
-        self.angles = {}
+        self.angles = {} #trajectories ja angles -sanakirjat käytössä vain ensimmäisessä versiossa reitin piirrosta
         for shape in self.shapes:
             self.trajectories[shape] = []
             self.angles[shape] = []
@@ -37,15 +37,16 @@ class Simulation:
                     impulse = self.impulse(self.collision_items["edge_shape"], self.collision_items["vertex_shape"], relative_velocity, self.collision_items["collision_vertex"], collision_normal)
                     self.update_shape_velocities(self.collision_items["edge_shape"], self.collision_items["vertex_shape"], self.collision_items["collision_vertex"], collision_normal, impulse)
 
+            plot_interval += 1
             for shape in self.shapes:
                 shape.move_shape(shape.velocity, self.delta_time)
                 shape.rotate()
-                plot_interval += 1
                 if plot_interval == draw_config["plot_interval"]:
                     shape.plot()
-                    plot_interval = 0
-                time += self.delta_time
 
+            time += self.delta_time
+            if plot_interval == draw_config["plot_interval"]:
+                plot_interval = 0
         plt.show()
 
     def generate_cm_trajectory(self):
