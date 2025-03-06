@@ -3,7 +3,7 @@ from shape import Shape
 
 
 class Simulation:
-    def __init__(self, shapes, sim_time=3, delta_time=0.05, gravity=-9.81, e=1):
+    def __init__(self, shapes, sim_time=3, delta_time=0.001, gravity=-9.81, e=1):
         self.shapes = shapes
         self.sim_time = sim_time
         self.delta_time = delta_time
@@ -26,6 +26,7 @@ class Simulation:
             shape.plot()
 
         time = self.delta_time
+        plot_interval = 0
         while time < self.sim_time - self.delta_time:
             if self.collision():
                 closest_edge = self.closest_edge(self.collision_items["collision_vertex"], self.collision_items["edge_shape"])
@@ -39,7 +40,10 @@ class Simulation:
             for shape in self.shapes:
                 shape.move_shape(shape.velocity, self.delta_time)
                 shape.rotate()
-                shape.plot()
+                plot_interval += 1
+                if plot_interval == draw_config["plot_interval"]:
+                    shape.plot()
+                    plot_interval = 0
                 time += self.delta_time
 
         plt.show()
@@ -93,7 +97,6 @@ class Simulation:
                         cross_products.append(cross)
 
                     if np.all(np.array(cross_products) > 0):
-                        print(f"Collision detected: vertex {vertex} inside shape {edge_shape.vertices}!")
                         self.collision_items = {
                             "collision_vertex": np.array(vertex),
                             "edge_shape": edge_shape,
@@ -108,7 +111,6 @@ class Simulation:
         smallest_distance = float('inf')
 
         edges = edge_shape.get_edges()
-        print(edges)
         for i, edge in enumerate(edges):
             r_EP = collision_vertex - edge_shape.vertices[i]
             norm = np.linalg.norm(edge)
@@ -159,7 +161,7 @@ class Simulation:
         relative_dot_product = np.dot(relative_velocity, collision_normal)
 
         impulse = -(1 + self.e) * (relative_dot_product / (mass_inverse_sum + inertia_component_A + inertia_component_B))
-
+        print(f"Impulse: {impulse}")
         return impulse
 
     def update_shape_velocities(self, edge_shape, vertex_shape, collision_vertex, collision_normal, impulse):
@@ -168,8 +170,6 @@ class Simulation:
 
         vertex_shape.velocity = v_A
         edge_shape.velocity = v_B
-
-        print(vertex_shape.velocity, edge_shape.velocity)
 
         AP = (collision_vertex - vertex_shape.cm())
         r_AP = np.array([AP[0], AP[1], 0])
@@ -183,3 +183,4 @@ class Simulation:
 
         vertex_shape.rotation = updated_rot_A
         edge_shape.rotation = updated_rot_B
+        print(f"Updated rotations: {vertex_shape.rotation} and {edge_shape.rotation}")

@@ -26,6 +26,8 @@ class Shape:
             np.append(self.vertices[:, 0], self.vertices[0, 0]),
             np.append(self.vertices[:, 1], self.vertices[0, 1])
         )
+        x, y = self.cm()
+        plt.plot(x, y, "bo")
 
         for i in range(len(self.vertices)):
             label = chr(65 + i)
