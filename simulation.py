@@ -29,13 +29,13 @@ class Simulation:
         plot_interval = 0
         while time < self.sim_time - self.delta_time:
             if self.collision():
-                closest_edge = self.closest_edge(self.collision_items["collision_vertex"], self.collision_items["edge_shape"])
-                relative_velocity = self.relative_velocity(self.collision_items["collision_vertex"], self.collision_items["edge_shape"], self.collision_items["vertex_shape"])
+                closest_edge = self.closest_edge()
+                relative_velocity = self.relative_velocity()
                 collision_normal = self.collision_normal(closest_edge)
 
                 if np.dot(relative_velocity, collision_normal) < 0:
-                    impulse = self.impulse(self.collision_items["edge_shape"], self.collision_items["vertex_shape"], relative_velocity, self.collision_items["collision_vertex"], collision_normal)
-                    self.update_shape_velocities(self.collision_items["edge_shape"], self.collision_items["vertex_shape"], self.collision_items["collision_vertex"], collision_normal, impulse)
+                    impulse = self.impulse(relative_velocity, collision_normal)
+                    self.update_shape_velocities(collision_normal, impulse)
 
             plot_interval += 1
             for shape in self.shapes:
@@ -107,9 +107,11 @@ class Simulation:
 
         return False
 
-    def closest_edge(self, collision_vertex, edge_shape):
+    def closest_edge(self):
         closest_edge = None
         smallest_distance = float('inf')
+        collision_vertex = self.collision_items["collision_vertex"]
+        edge_shape = self.collision_items["edge_shape"]
 
         edges = edge_shape.get_edges()
         for i, edge in enumerate(edges):
@@ -125,7 +127,11 @@ class Simulation:
         return closest_edge
 
 
-    def relative_velocity(self, collision_vertex, edge_shape, vertex_shape):
+    def relative_velocity(self):
+        collision_vertex = self.collision_items["collision_vertex"]
+        edge_shape = self.collision_items["edge_shape"]
+        vertex_shape = self.collision_items["vertex_shape"]
+
         r_AP = (collision_vertex - vertex_shape.cm())
         r_BP = (collision_vertex - edge_shape.cm())
 
@@ -150,7 +156,11 @@ class Simulation:
 
         return normal / norm if norm !=0 else normal
 
-    def impulse(self, edge_shape, vertex_shape, relative_velocity, collision_vertex, collision_normal):
+    def impulse(self, relative_velocity, collision_normal):
+        edge_shape = self.collision_items["edge_shape"]
+        vertex_shape = self.collision_items["vertex_shape"]
+        collision_vertex = self.collision_items["collision_vertex"]
+
         r_AP = (collision_vertex - vertex_shape.cm())
         r_BP = (collision_vertex - edge_shape.cm())
 
@@ -165,7 +175,11 @@ class Simulation:
         print(f"Impulse: {impulse}")
         return impulse
 
-    def update_shape_velocities(self, edge_shape, vertex_shape, collision_vertex, collision_normal, impulse):
+    def update_shape_velocities(self, collision_normal, impulse):
+        edge_shape = self.collision_items["edge_shape"]
+        vertex_shape = self.collision_items["vertex_shape"]
+        collision_vertex = self.collision_items["collision_vertex"]
+
         v_A = vertex_shape.velocity + impulse/vertex_shape.mass * collision_normal
         v_B = edge_shape.velocity - impulse/edge_shape.mass * collision_normal
 
