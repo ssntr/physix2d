@@ -1,6 +1,4 @@
 from config import np, plt, draw_config
-from shape import Shape
-
 
 class Simulation:
     def __init__(self, shapes, sim_time=3, delta_time=0.001, gravity=-9.81, e=1):
