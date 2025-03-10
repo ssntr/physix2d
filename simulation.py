@@ -2,6 +2,7 @@ from config import np, plt, draw_config
 
 #Simulation - luokka hoitaa fysiikan laskennat, ja ottaa parametreinä
 #listan simuloitavista Shape-luokan olioista.
+#vapaaehtoisina parametreina simulaation aika, delta-aika, painovoima sekä törmäyskerroin
 class Simulation:
     def __init__(self, shapes, sim_time=3, delta_time=0.001, gravity=-9.81, e=1):
         self.shapes = shapes
