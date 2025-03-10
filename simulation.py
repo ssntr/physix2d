@@ -1,5 +1,7 @@
 from config import np, plt, draw_config
 
+#Simulation - luokka hoitaa fysiikan laskennat, ja ottaa parametreinä
+#listan simuloitavista Shape-luokan olioista.
 class Simulation:
     def __init__(self, shapes, sim_time=3, delta_time=0.001, gravity=-9.81, e=1):
         self.shapes = shapes
@@ -15,6 +17,7 @@ class Simulation:
 
         self.collision_items = None
 
+    #Päämetodi, joka ajaa kaikki simuloinnin osa-alueet
     def handle_simulation(self):
         plt.figure(figsize=draw_config["figsize"])
         plt.xlim(draw_config["xlim"])
@@ -27,11 +30,13 @@ class Simulation:
         time = self.delta_time
         plot_interval = 0
         while time < self.sim_time - self.delta_time:
+            # Törmäystarkistus 1: onko piste toisen kulmion sisällä?
             if self.collision():
                 closest_edge = self.closest_edge()
                 relative_velocity = self.relative_velocity()
                 collision_normal = self.collision_normal(closest_edge)
 
+                # Törmäystarkistus 2: onko suhteellisen nopeuden ja törmäysnormaalin pistetulo negatiivinen?
                 if np.dot(relative_velocity, collision_normal) < 0:
                     impulse = self.impulse(relative_velocity, collision_normal)
                     self.update_shape_velocities(collision_normal, impulse)
@@ -48,6 +53,7 @@ class Simulation:
                 plot_interval = 0
         plt.show()
 
+    #Metodi, jolla voi laskea kuvioiden liikeradat ilman törmäystarkistusta
     def generate_cm_trajectory(self):
         for shape in self.shapes:
             x, y = shape.cm()
@@ -63,6 +69,7 @@ class Simulation:
 
             self.trajectories[shape] = np.array(means)
 
+    # Piirto/plot-metodi ylemmän generate_cm_trajectoryn piirtämiseen
     def draw_movement(self):
         plt.figure(figsize=draw_config["figsize"])
         plt.xlim(draw_config["xlim"])
@@ -80,7 +87,7 @@ class Simulation:
 
         plt.show()
 
-
+    # Törmäystarkistusmetodi Shape-olioiden kulmapisteiden ja reunojen tarkistukseen
     def collision(self):
         for i, edge_shape in  enumerate(self.shapes):
             edges = edge_shape.get_edges()
@@ -96,6 +103,7 @@ class Simulation:
                         cross = float(np.cross(edges[k], rp))
                         cross_products.append(cross)
 
+                    #Jos törmäys havaitaan, Simulation-luokkaan tallennetaan tarvittavat tiedot sanakirjana.
                     if np.all(np.array(cross_products) > 0):
                         self.collision_items = {
                             "collision_vertex": np.array(vertex),
@@ -106,6 +114,7 @@ class Simulation:
 
         return False
 
+    # Metodi, joka laskee törmäyspistettä lähimmän toisen Shape-olion reunan
     def closest_edge(self):
         closest_edge = None
         smallest_distance = float('inf')
@@ -126,6 +135,7 @@ class Simulation:
         return closest_edge
 
 
+    # Metodi, joka laskee suhteellisen nopeuden
     def relative_velocity(self):
         collision_vertex = self.collision_items["collision_vertex"]
         edge_shape = self.collision_items["edge_shape"]
@@ -146,6 +156,7 @@ class Simulation:
 
         return velocity_AP - velocity_BP
 
+    # Metodi, joka laskee törmäysnormaalin
     def collision_normal(self, closest_edge):
         edge_3d = np.array([closest_edge[0], closest_edge[1], 0])
         k = np.array([0, 0, 1])
@@ -155,6 +166,7 @@ class Simulation:
 
         return normal / norm if norm !=0 else normal
 
+    # Impulssin laskentametodi
     def impulse(self, relative_velocity, collision_normal):
         edge_shape = self.collision_items["edge_shape"]
         vertex_shape = self.collision_items["vertex_shape"]
@@ -174,6 +186,7 @@ class Simulation:
         print(f"Impulse: {impulse}")
         return impulse
 
+    #Metodi, joka päivittää törmäykseen osallistuvien Shape-olioiden velocity - ja rotation -arvot
     def update_shape_velocities(self, collision_normal, impulse):
         edge_shape = self.collision_items["edge_shape"]
         vertex_shape = self.collision_items["vertex_shape"]

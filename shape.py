@@ -1,5 +1,8 @@
 from config import np, plt, draw_config
 
+# Luokka, johon voi syöttää pisteitä kaksiulotteisena listana,
+# sekä vapaavalintaisesti massan, liikenopeusvektorin,
+# pyörimisnopeuden (rotation) sekä hitausmomentin.
 class Shape:
     def __init__(self, vertices, mass=1, velocity=np.array([0, 0]), rotation=0, j=0.02):
         self.vertices = np.array(vertices)
@@ -8,19 +11,23 @@ class Shape:
         self.rotation = rotation
         self.angle = 0
         self.j = j
-        self.reference_vertices = self.cm_in_origin().copy()
+        self.reference_vertices = self.cm_in_origin().copy() #Kopio luokan kulmapisteistä, kun sen cm on origossa
 
+    #Metodi, joka palauttaa olion massakeskipisteen
     def cm(self):
         return self.vertices.mean(axis=0)
 
+    #Metodi, joka palauttaa olion reunat, kun massakeskipisteen siirtää origoon.
     def cm_in_origin(self):
         vector_to_origin = np.array([0, 0]) - self.cm()
         return self.vertices + vector_to_origin
 
+    #Metodi, joka liikuttaa oliota vektorin verran per delta_aika (1 = liikutus vektorin verran)
     def move_shape(self, vector, delta_time):
         self.vertices += vector * delta_time
         self.angle += self.rotation * delta_time
 
+    #Olion plottaamismetodi
     def plot(self):
         plt.plot(
             np.append(self.vertices[:, 0], self.vertices[0, 0]),
@@ -38,6 +45,7 @@ class Shape:
         #              ha="right", va="bottom", color=draw_config["txt_color"])
         '''
 
+    #Metodi, jolla olion voi piirtää suoraan (sisältää siis plt.show)
     def draw(self):
         plt.figure(figsize=draw_config["figsize"])
         plt.xlim(draw_config["xlim"])
@@ -45,6 +53,8 @@ class Shape:
         self.plot()
         plt.show()
 
+    #Metodi, joka pyörittää olion kulmia päivitetyn anglen mukaiseksi
+    #(Käyttää tallennettua reference_verticesiä, jonka cm on origossa, ja lisää muutoksen "oikeisiin" kulmapisteisiin)
     def rotate(self):
         rotation_matrix = np.array([
             [np.cos(self.angle), -np.sin(self.angle)],
@@ -54,6 +64,8 @@ class Shape:
         rotated_vertices = (rotation_matrix @ self.reference_vertices.T).T
         self.vertices = rotated_vertices + self.cm()
 
+    # Metodi, joka palauttaa olion reunat pisteiden syöttämisjärjestyksessä vektoreina
+    # Kulmat tulisi siis syöttää oikeassa järjestyksessä, jotta simulaatio toimii oikein
     def get_edges(self):
         edges = []
         for i in range(len(self.vertices)):

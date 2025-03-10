@@ -1,6 +1,10 @@
+#Tämä tiedosto sisältää numpyn ja matplotlibin importit sekä piirtoon liittyviä konfiguraatioita.
+
 import numpy as np
 import matplotlib.pyplot as plt
 
+#Säätämälä plot_intervalia pienemmäksi simulaation tapahtumat
+#näkee tiheämmällä piirtovälillä
 draw_config = {
     "figsize": (5, 5),
     "xlim": (-1, 1),
