@@ -21,6 +21,7 @@ class Simulation:
         plt.ylim(draw_config["ylim"])
 
         for shape in self.shapes:
+            shape.rotate()
             shape.plot()
 
         time = self.delta_time

@@ -26,14 +26,17 @@ class Shape:
             np.append(self.vertices[:, 0], self.vertices[0, 0]),
             np.append(self.vertices[:, 1], self.vertices[0, 1])
         )
-        x, y = self.cm()
-        plt.plot(x, y, "bo")
+        '''
+        Debug-piirtokoodi massakeskipisteelle ja kulmien järjestykselle:
+        # x, y = self.cm()
+        # plt.plot(x, y, "bo")
 
-        for i in range(len(self.vertices)):
-            label = chr(65 + i)
-            plt.text(self.vertices[i, 0], self.vertices[i, 1], label,
-                     fontsize=draw_config["fontsize"],
-                     ha="right", va="bottom", color=draw_config["txt_color"])
+        # for i in range(len(self.vertices)):
+        #     label = chr(65 + i)
+        #     plt.text(self.vertices[i, 0], self.vertices[i, 1], label,
+        #              fontsize=draw_config["fontsize"],
+        #              ha="right", va="bottom", color=draw_config["txt_color"])
+        '''
 
     def draw(self):
         plt.figure(figsize=draw_config["figsize"])
